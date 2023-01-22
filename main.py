@@ -149,10 +149,10 @@ def test_accuracy_test():
 passenger_id_to_predictions_dict = defaultdict(list)
 # Train the network 5 times total, keeping track of the predictions
 output = None
-for train_iteration in range(16):
+for train_iteration in range(7):
     net = Net(X_train.shape[1], 100, 1)
     criterion = torch.nn.BCELoss()
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.0003)
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 
     for epoch in range(40000):
         optimizer.zero_grad()
@@ -160,7 +160,7 @@ for train_iteration in range(16):
         loss = criterion(output, y_train.view(-1, 1))
         loss.backward()
         optimizer.step()
-        if loss.item() < 0.21:
+        if loss.item() < 0.13:
             break
         if epoch % 100 == 0:
             print("Epoch: {}, Loss: {}".format(epoch, loss.item()))
@@ -200,3 +200,6 @@ final_predictions.columns = ["PassengerId", "Survived"]
 final_predictions["PassengerId"] = final_predictions["PassengerId"].astype(int)
 final_predictions.to_csv("submission.csv", index=False)
 
+# now call kaggle competitions submit -c titanic -f submission.csv -m "Message" on the command line to submit the predictions to Kaggle
+import os
+os.system("kaggle competitions submit -c titanic -f submission.csv -m \"Message\"")
